@@ -3,6 +3,11 @@ from loginform import LoginForm
 import json
 import random
 import os
+import smtplib 
+from string import Template 
+from email.mime.multipart import MIMEMultipart 
+from email.mime.text import MIMEText
+
 
 app = Flask(__name__)
 app.config["PHOTO_FOLDER"] = os.path.join(app.root_path,"members","photo")
@@ -20,9 +25,10 @@ urls = ['/index', '/list_prof']
 def index():
     param = {}
     param['title'] = 'Добро пожаловать!'
-    param['urls'] = urls
+    #param['urls'] = urls
     param['h1'] = "Миссия Колонизация Марса"
     param['h4'] = "И на Марсе будут яблони цвести!"
+    redirect('/success')
     return render_template('index.html', **param)
 
 
@@ -38,7 +44,7 @@ def list_prof(list):
 @app.route('/distribution')
 def distribution():
     param = {}
-    with open("static/members//crew.json", "r") as json_file:
+    with open("members//crew.json", "r") as json_file:
         members_load = json.load(json_file)
         param['members'] = members_load
     param['title'] = "Размещение"
@@ -84,14 +90,16 @@ def room(sex,age):
     return render_template('room.html', **param)
 
 
-@app.route('/astronaut_selection')
+@app.route('/astronaut_selection', methods=['GET', 'POST'])
 def astronaut_selection():
     param = {}
     param['title'] = "Запись добровольцем"
     form = LoginForm()
     param['form'] = form
     if form.validate_on_submit():
-        return redirect('/success')
+        print(form.data)
+        
+        #return redirect('/success')
     return render_template('astronaut_selection.html', **param)
 
 
