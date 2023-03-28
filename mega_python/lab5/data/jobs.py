@@ -13,9 +13,12 @@ class Jobs(SqlAlchemyBase):
     team_leader = sqlalchemy.Column(sqlalchemy.Integer,
                                     sqlalchemy.ForeignKey("users.id"))
     job = sqlalchemy.Column(sqlalchemy.String)
-    work_size = sqlalchemy.Column(sqlalchemy.Double)
+    work_size = sqlalchemy.Column(sqlalchemy.Float)
     collaborators = sqlalchemy.Column(sqlalchemy.String)
     start_date = sqlalchemy.Column(sqlalchemy.Date)
     end_date = sqlalchemy.Column(sqlalchemy.Date)
     is_finished = sqlalchemy.Column(sqlalchemy.Boolean)
     user = orm.relationship('User')
+
+    def __repr__(self) -> str:
+        return f"<Job> {self.job}"
