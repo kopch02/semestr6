@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Список работ</h1>
+{% for item in jobs%}
+    
+        <h2>{{item.id}}</h2>
+        <table bgcolor="#ffcc00" border="3" bordercolor="red" cellpadding="10">
+            <tr>
+                <td>Название работы </td>
+                <td>ФИО ответсвенного</td>
+                <td>Продолжительность в часах</td>
+                <td>id команды</td>
+                <td>Статус</td>
+              </tr>
+              <tr>
+                <td>{{item.job}}</td>
+                <td>{{item.user.surname}} {{item.user.name}}</td>
+                <td>{{item.work_size}}</td>
+                <td>{{item.collaborators}}</td>
+                <td>{{item.is_finished}}</td>
+              </tr>
+        </table>
+        
+        
+
+{% endfor %}
+{% endblock %}
