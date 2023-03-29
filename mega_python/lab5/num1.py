@@ -6,7 +6,7 @@ from data.departament import Departament
 import datetime
 
 
-def add_user(surname:str, name:str, age:int, position:str, speciality:str, addres:str, email:str):
+def add_user(surname:str, name:str, age:int, position:str, speciality:str, addres:str, email:str, passworld:str = None):
     user = User()
 
     user.surname = surname
@@ -18,6 +18,8 @@ def add_user(surname:str, name:str, age:int, position:str, speciality:str, addre
     user.email = email
 
     db_sess = db_session.create_session()
+    if passworld != None:
+        user.set_password(passworld)
     db_sess.add(user)
     db_sess.commit()
 
