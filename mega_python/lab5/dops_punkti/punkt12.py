@@ -8,8 +8,8 @@ from num1 import add_jobs, add_departament
 def main():
     db_session.global_init("db/mars_explorer.db")
     db_sess = db_session.create_session()
-    #add_departament("геологической разведки",1,"2;3;4","geolog@email.com")
-    #add_jobs(1,"testing punkt 12",25,"2;4")
+    add_departament("геологической разведки",1,"2;3;4","geolog@email.com")
+    add_jobs(1,"testing punkt 12",25,"2;4")
     for dept in db_sess.query(Departament).filter(Departament.id == 1):
         w = dept.members.split(";")
 

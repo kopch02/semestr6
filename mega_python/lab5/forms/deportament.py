@@ -1,19 +1,14 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField, EmailField, SelectField
+from wtforms import SelectMultipleField, StringField, SubmitField, EmailField, SelectField
 from wtforms.validators import DataRequired
 prof = ["инженер-исследователь", "пилот, строитель",
 "экзобиолог", "врач", "инженер по терраформированию", "климатолог", "специалист по радиационной защите", "астрогеолог", "гляциолог", 
 "инженер жизнеобеспечения", "метеоролог", "оператор марсохода", "киберинженер",
 "штурман", "пилот дронов"]
 
-class RegisterForm(FlaskForm):
-    surname = StringField('Фамилия', validators=[DataRequired()])
-    name = StringField('Имя', validators=[DataRequired()])
-    age = StringField('Возрост', validators=[DataRequired()])
-    position = StringField('Должность', validators=[DataRequired()])
-    speciality = SelectField('Профессия', validators=[DataRequired()], choices=prof)
-    addres = StringField('Адрес модуля', validators=[DataRequired()])
+class DeportamentForm(FlaskForm):
+    title = StringField('Название депортамента', validators=[DataRequired()])
+    chief = SelectField('Начальник депортамента', validators=[DataRequired()])
+    members = SelectMultipleField('Участники', validators=[DataRequired()], validate_choice=False)
     email = EmailField('Почта', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
-    password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
-    submit = SubmitField('Войти')
+    submit = SubmitField('Добавить')

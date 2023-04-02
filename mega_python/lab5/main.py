@@ -2,8 +2,10 @@ from flask import Flask, url_for, render_template, redirect, send_from_directory
 from data import db_session
 from data.users import User
 from data.jobs import Jobs
+from data.departament import Departament
 from forms.user import RegisterForm
 from forms.job import JobsForm
+from forms.deportament import DeportamentForm
 from num1 import add_user, add_departament, add_jobs
 
 app = Flask(__name__)
@@ -71,6 +73,25 @@ def add_job():
         
         return redirect('/login')
     return render_template('add_job.html', title='Опять работать? ', form=form)
+
+
+@app.route('/add_deportament', methods=['GET', 'POST'])
+def add_departaments():
+    db_sess = db_session.create_session()
+    form = DeportamentForm()
+    team_list = db_sess.query(User).all()
+    form.chief.choices = team_list
+    form.members.choices = team_list
+    if form.validate_on_submit():
+        members = ""
+        for i in form.members.data:
+            members += str(int(i[11:13])) + ";"
+        add_departament(form.title.data,
+                        int(form.chief.data[11:13]),
+                        members,
+                        form.email.data)
+        return redirect('/login')
+    return render_template('add_deportament.html', title='Новый депортамент? ', form=form)
 
 
 if __name__ == '__main__':
