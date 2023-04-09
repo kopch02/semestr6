@@ -14,7 +14,7 @@ prof = [
 class RegisterForm(FlaskForm):
     surname = StringField('Фамилия', validators=[DataRequired()])
     name = StringField('Имя', validators=[DataRequired()])
-    age = StringField('Возрост', validators=[DataRequired()])
+    age = StringField('Возраст', validators=[DataRequired()])
     position = StringField('Должность', validators=[DataRequired()])
     speciality = SelectField('Профессия',
                              validators=[DataRequired()],
