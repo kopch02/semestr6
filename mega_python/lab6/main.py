@@ -3,6 +3,8 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from data import db_session
 from data.users import User
 from data.jobs import Jobs
+from data.jobs import Categories
+from data.jobs import Link
 from data.departament import Departament
 from forms.user import RegisterForm, LoginForm
 from forms.authorization import AuthorizationForm
@@ -33,8 +35,11 @@ def index():
     param = {}
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
+        categories = db_sess.query(Categories).all()
         jobs = db_sess.query(Jobs).all()
+        param["categories"] = categories
         param["jobs"] = jobs
+        param["header"] = "Все работы"
         return render_template('index.html', **param)
     else:
         return render_template('authorization.html')
@@ -103,10 +108,13 @@ def add_job():
     db_sess = db_session.create_session()
     form = JobsForm()
     team_list = db_sess.query(User).all()
+    categori_list = db_sess.query(Categories).all()
     form.team_leader.choices = [(user.id, user.name + " " + user.surname)
                                 for user in team_list]
     form.collaborators.choices = [(user.id, user.name + " " + user.surname)
                                   for user in team_list]
+    form.categori.choices = [(categoria.id, categoria.title)
+                             for categoria in categori_list]
     if form.validate_on_submit():
         collaborators = ""
         for i in form.collaborators.data:
@@ -118,7 +126,8 @@ def add_job():
                  form.job.data,
                  form.work_size.data,
                  collaborators,
-                 is_finished=form.is_finished.data)
+                 is_finished=form.is_finished.data,
+                 categori=form.categori.data)
 
         return redirect('/')
     return render_template('add_job.html', title='Опять работать? ', form=form)
@@ -128,8 +137,12 @@ def add_job():
 @login_required
 def delete_job(id):
     db_sess = db_session.create_session()
-    job = db_sess.query(Jobs).filter(Jobs.id == id, ).first()
+    job = db_sess.query(Jobs).filter(Jobs.id == id).first()
     if job:
+        links = db_sess.query(Link).filter(Link.jobs_id == id).all()
+        if links:
+            for i in links:
+                db_sess.delete(i)
         db_sess.delete(job)
         db_sess.commit()
     else:
@@ -143,10 +156,13 @@ def job_editing(id):
     form = JobsForm()
     db_sess = db_session.create_session()
     team_list = db_sess.query(User).all()
+    categori_list = db_sess.query(Categories).all()
     form.team_leader.choices = [(user.id, user.name + " " + user.surname)
                                 for user in team_list]
     form.collaborators.choices = [(user.id, user.name + " " + user.surname)
                                   for user in team_list]
+    form.categori.choices = [(categoria.id, categoria.title)
+                             for categoria in categori_list]
     if request.method == "GET":
         job = db_sess.query(Jobs).filter(Jobs.id == id).first()
         if job:
@@ -155,12 +171,14 @@ def job_editing(id):
             form.work_size.data = job.work_size
             form.collaborators.data = job.collaborators
             form.is_finished.data = job.is_finished
+            form.categori.data = job.categories
         else:
             abort(404)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         job = db_sess.query(Jobs).filter(Jobs.id == id).first()
         if job:
+
             job.team_leader = form.team_leader.data
             job.job = form.job.data
             job.work_size = form.work_size.data
@@ -169,6 +187,20 @@ def job_editing(id):
             for i in form.collaborators.data:
                 collaborators += str(int(i)) + ";"
             job.collaborators = collaborators
+            if form.is_finished.data:
+                cat = db_sess.query(Categories).filter_by(
+                    title="Завершённые").first()
+                job.categories.append(cat)
+            else:
+                cat = db_sess.query(Categories).filter_by(
+                    title="Завершённые").first()
+                if cat in job.categories:
+                    links = db_sess.query(Link).filter(
+                        Link.jobs_id == job.id,
+                        Link.categories_id == cat.id).all()
+                    if links:
+                        for i in links:
+                            db_sess.delete(i)
             db_sess.commit()
             return redirect("/")
         else:
@@ -229,9 +261,9 @@ def deportament_editing(id):
     db_sess = db_session.create_session()
     team_list = db_sess.query(User).all()
     form.chief.choices = [(user.id, user.name + " " + user.surname)
-                                for user in team_list]
+                          for user in team_list]
     form.members.choices = [(user.id, user.name + " " + user.surname)
-                                  for user in team_list]
+                            for user in team_list]
     if request.method == "GET":
         departament = db_sess.query(Departament).filter(
             Departament.id == id).first()
@@ -241,7 +273,7 @@ def deportament_editing(id):
             form.members.data = departament.members
             form.email.data = departament.email
         else:
-            abort(404) 
+            abort(404)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         departament = db_sess.query(Departament).filter(
@@ -266,9 +298,18 @@ def deportament_editing(id):
 @app.route('/authorization')
 def authorization():
     form = AuthorizationForm()
-    #if form.validate_on_submit:
-    #    return
     return render_template('authorization.html', form=form)
+
+
+@app.route('/categories/<int:id>', methods=['GET', 'POST'])
+@login_required
+def categories(id):
+    param = {}
+    db_sess = db_session.create_session()
+    categori = db_sess.query(Categories).filter_by(id=id).first()
+    param["categori_title"] = categori.title
+    param["jobs"] = categori.jobs
+    return render_template("categories.html", **param)
 
 
 if __name__ == '__main__':

@@ -13,5 +13,6 @@ class JobsForm(FlaskForm):
     collaborators = SelectMultipleField('Участники',
                                         validators=[DataRequired()],
                                         validate_choice=False)
+    categori = SelectMultipleField("Категории",validate_choice=False)
     is_finished = BooleanField("Завершена?")
     submit = SubmitField('Добавить')

@@ -1,6 +1,7 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}" type="text/css"/>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet"
@@ -23,8 +24,9 @@
         {% endif %}
 </header>
 <!-- Begin page content -->
-<main role="main" class="container">
+{% block side_content %}{% endblock %}
+<div class="main">
     {% block content %}{% endblock %}
-</main>
+</div>
 </body>
 </html>
