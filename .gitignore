@@ -9,4 +9,5 @@ open_api.txt
 *Lib
 *share
 *workon
-*/pyvenv.cfg
+**/pyvenv.cfg
+**/__pycache__
