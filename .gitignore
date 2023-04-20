@@ -11,3 +11,4 @@ open_api.txt
 *workon
 **/pyvenv.cfg
 **/__pycache__
+*.dat
