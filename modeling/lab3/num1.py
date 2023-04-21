@@ -11,6 +11,7 @@ import scipy.stats as stats
 
 
 def checking_hypo(z):
+    global theorFrequnces
 
     h = (max(z) - min(z)) / (1.0 + 3.3231 * math.log10(100))
 
@@ -24,38 +25,38 @@ def checking_hypo(z):
     print(f"{np.array(ranges) = }")
 
     phi = lambda u: math.e**((-u**2) / 2) / math.sqrt(2 * math.pi)
-    theorFrequnces = []
+    theorFrequences = []
     for i in range(len(ranges)):
         ui = ((ranges[i][0] + ranges[i][1]) / 2 - x_) / sigma
-        theorFrequnces.append((n * h * phi(ui)) / sigma)
+        theorFrequences.append((n * h * phi(ui)) / sigma)
 
     print(f"{theorFrequences = }")  #теоретические частоты
 
-    frequnces = []
+    frequences = []
     for i in ranges:
         count = 0
         for j in range(len(z)):
             if z[j] >= i[0] and z[j] <= i[1]:
                 count += 1
-        frequnces.append(count)
+        frequences.append(count)
 
-    print(f"{frequnces = }")  # частоты
+    print(f"{frequences = }")  # частоты
 
-    frequencesCopy = copy.copy(frequnces)
+    frequencesCopy = copy.copy(frequences)
     #theorFrequncesCopy = copy.copy(theorFrequnces)
 
-    frequncesUnion(theorFrequnces, frequnces)
+    frequncesUnion(theorFrequences, frequences)
 
     print(f"{theorFrequences = }")  #теоретические частоты после объединения
     print(f"{frequences = }")  #Частоты(после объединения)
 
     hiSqrLook = 0
 
-    for i in range(len(frequnces)):
-        hiSqrLook += (frequnces[i] - theorFrequnces[i])**2 / theorFrequnces[i]
+    for i in range(len(frequences)):
+        hiSqrLook += (frequences[i] - theorFrequences[i])**2 / theorFrequences[i]
 
     # alpha = 0.05 к=3
-    hiSqrLook_krit = stats.chi2.ppf(1 - .05, df=len(theorFrequnces) - 2)
+    hiSqrLook_krit = stats.chi2.ppf(1 - .05, df=len(theorFrequences) )
     print("Хи квадрат: ", hiSqrLook)
     print("Хи кр квадрат: ", hiSqrLook_krit)
 
@@ -112,8 +113,18 @@ def checking_hypo(z):
 
 def frequncesUnion(theorFrequences, frequences):
     i = len(theorFrequences) - 1
+    mega_i = len(theorFrequences) - 1
 
     while i >= 0:
+        if i == mega_i:
+            if theorFrequences[0] < 5 or frequences[0] < 5:
+                i -= 1
+                theorFrequences[1] += theorFrequences[0]
+                frequences[1] += frequences[0]
+                del theorFrequences[0]
+                del frequences[0]
+                continue
+
         if theorFrequences[i] < 5.0:
             if i != len(theorFrequences) - 1:
                 left = theorFrequences[i - 1]
@@ -138,7 +149,7 @@ def frequncesUnion(theorFrequences, frequences):
         i -= 1
 
 
-np.random.seed(0)
+#np.random.seed(0)
 
 lambd = 0.1
 
@@ -213,10 +224,10 @@ print(f"{theorFrequences = }")  #теоретические частоты по�
 print(f"{frequences = }")  #Частоты(после объединения)
 
 pirson = 0
-for i in range(len(theorFrequences) - 2):
+for i in range(len(theorFrequences) ):
     pirson += ((frequences[i] - theorFrequences[i])**2) / theorFrequences[i]
 
-pirson_krit = stats.chi2.ppf(1 - .05, df=len(theorFrequences) - 2)
+pirson_krit = stats.chi2.ppf(1 - .05, df=len(theorFrequences) )
 
 print(f"{pirson = }")
 print(f"{pirson_krit = }")
