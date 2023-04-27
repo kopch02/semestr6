@@ -12,3 +12,4 @@ open_api.txt
 **/pyvenv.cfg
 **/__pycache__
 *.dat
+*.exe
